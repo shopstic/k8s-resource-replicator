@@ -1,0 +1,20 @@
+apiVersion: shopstic.com/v1
+kind: ReplicatedResource
+metadata:
+  name: foo-replication
+  namespace: default
+spec:
+  kind: configmap
+  fromNamespace: default
+  fromName: foo
+  toName: bar
+  patches:
+    - op: replace
+      path: "/data/one"
+      value: replaced_one
+    - op: add
+      path: "/data/ten"
+      value: added_ten
+    - op: move
+      from: "/data/three"
+      path: "/data/moved_three_again_here"
