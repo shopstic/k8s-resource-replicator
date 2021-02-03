@@ -4,17 +4,24 @@ metadata:
   name: foo-replication
   namespace: default
 spec:
-  kind: configmap
+  kind: secret
   fromNamespace: default
   fromName: foo
   toName: bar
   patches:
     - op: replace
-      path: "/data/one"
+      path: "/stringData/one"
       value: replaced_one
     - op: add
-      path: "/data/ten"
+      path: "/stringData/ten"
       value: added_ten
     - op: move
-      from: "/data/three"
-      path: "/data/moved_three_again_here"
+      from: "/stringData/three"
+      path: "/stringData/moved_three_again_here"
+    - op: render
+      path: "/stringData/templated"
+      template: |-
+        copy_of_one: {{stringData.one}}
+        copy_of_ten: {{stringData.ten}}
+        something_else: whatever_here
+      replace: false

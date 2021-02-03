@@ -1,8 +1,9 @@
 import { loggerWithContext } from "./logger.ts";
 import { replicate } from "./replicate.ts";
 import { ReplicatedResourceWatchEventSchema } from "./schemas.ts";
-import { watchResources } from "./watch.ts";
+import { WatchCompletedPrematurely, watchResources } from "./watch.ts";
 import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "https://raw.githubusercontent.com/shopstic/k8s-deno-client/1.19.2/models/IoK8sApimachineryPkgApisMetaV1OwnerReference.ts";
+import { sleep } from "./utils.ts";
 
 const logger = loggerWithContext("main");
 
@@ -35,13 +36,12 @@ interface ActiveReplication {
   cancel: () => void;
 }
 
-async function main() {
-  const activeReplicationMap: Map<string, ActiveReplication> = new Map();
+const activeReplicationMap: Map<string, ActiveReplication> = new Map();
 
+async function watchAndReconcile() {
   for await (
     const event of watchResources({
       fullName: "replicatedresource",
-      namespace: "default",
       schema: ReplicatedResourceWatchEventSchema,
       cancellation: waitForExitSignal(),
     })
@@ -90,6 +90,22 @@ async function main() {
         promise,
         cancel,
       });
+    }
+  }
+}
+async function main() {
+  while (true) {
+    try {
+      await watchAndReconcile();
+    } catch (e) {
+      if (e instanceof WatchCompletedPrematurely) {
+        logger.warn(
+          `Watch for replicated resources completed prematurely, going to retry in 1s`,
+        );
+        await sleep(1000);
+      } else {
+        throw e;
+      }
     }
   }
 }

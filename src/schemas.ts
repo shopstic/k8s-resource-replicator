@@ -1,4 +1,5 @@
 import {
+  Static,
   TSchema,
   Type,
 } from "https://raw.githubusercontent.com/shopstic/typebox/0.10.1/src/typebox.ts";
@@ -46,10 +47,15 @@ export const PatchOperationSchema = Type.Union([
   }),
   Type.Object({
     path: Type.String(),
-    op: Type.Literal("_get"),
-    value: Type.Any(),
+    op: Type.Literal("render"),
+    template: Type.String(),
+    replace: Type.Boolean(),
+    open: Type.Optional(Type.String()),
+    close: Type.Optional(Type.String()),
   }),
 ]);
+
+export type PatchOperation = Static<typeof PatchOperationSchema>;
 
 export const ReplicatedResourceSpecSchema = Type.Object({
   kind: Type.String(),

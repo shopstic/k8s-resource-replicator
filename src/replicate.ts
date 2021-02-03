@@ -2,7 +2,9 @@ import {
   Static,
   Type,
 } from "https://raw.githubusercontent.com/shopstic/typebox/0.10.1/src/typebox.ts";
-import { applyPatch } from "https://cdn.skypack.dev/fast-json-patch@3.0.0-1?dts";
+import {
+  applyReducer,
+} from "https://cdn.skypack.dev/fast-json-patch@3.0.0-1?dts";
 import {
   inheritExec,
 } from "https://raw.githubusercontent.com/shopstic/deno-utils/1.0.2/src/exec-utils.ts";
@@ -13,11 +15,13 @@ import {
 } from "./watch.ts";
 import {
   GenericResourceWatchEventSchema,
+  PatchOperation,
   ReplicatedResourceSpecSchema,
 } from "./schemas.ts";
 import { sleep } from "./utils.ts";
 import { Logger } from "https://deno.land/x/optic@1.2.2/logger/logger.ts";
 import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "https://raw.githubusercontent.com/shopstic/k8s-deno-client/1.19.2/models/IoK8sApimachineryPkgApisMetaV1OwnerReference.ts";
+import Template from "./template.ts";
 
 function stripKey(event: unknown, path: string[]) {
   let key = event;
@@ -49,6 +53,41 @@ interface ReplicationConfig {
   toNamespace: string;
   ownerReferences: Array<IoK8sApimachineryPkgApisMetaV1OwnerReference>;
   cancellation: Promise<void>;
+}
+
+function patch(
+  object: Record<string, unknown>,
+  patches: PatchOperation[],
+) {
+  if (object.kind === "Secret") {
+    object.stringData = Object.fromEntries(
+      Object
+        .entries(object.data as Record<string, string>)
+        .map(([k, v]) => ([k, atob(v)])),
+    );
+    delete object.data;
+  }
+
+  const patched = patches.reduce((o, p, i) => {
+    if (p.op === "render") {
+      const tpl = new Template({
+        open: p.open !== undefined ? p.open : "{{",
+        close: p.close !== undefined ? p.close : "}}",
+        isEscape: false,
+      });
+      const rendered = tpl.render(p.template, o);
+
+      return applyReducer(o, {
+        op: p.replace ? "replace" : "add",
+        path: p.path,
+        value: rendered,
+      }, i);
+    } else {
+      return applyReducer(o, p, i);
+    }
+  }, object);
+
+  return patched;
 }
 
 async function _replicate(
@@ -103,9 +142,7 @@ async function _replicate(
         },
       };
 
-      const patched = (patches)
-        ? applyPatch(replicated, patches).newDocument
-        : replicated;
+      const patched = (patches) ? patch(replicated, patches) : replicated;
 
       await inheritExec({
         run: {

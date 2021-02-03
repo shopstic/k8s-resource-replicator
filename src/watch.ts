@@ -23,7 +23,7 @@ export async function* watchResources<S extends TStatic>(
   { fullName, namespace, schema, cancellation }: {
     schema: S;
     fullName: string;
-    namespace: string;
+    namespace?: string;
     cancellation: Promise<void>;
   },
 ): AsyncIterableIterator<Static<S>> {
@@ -31,8 +31,7 @@ export async function* watchResources<S extends TStatic>(
     "kubectl",
     "get",
     fullName,
-    "-n",
-    namespace,
+    ...(namespace !== undefined ? ["-n", namespace] : ["-A"]),
     "--watch",
     "--output-watch-events",
     `-o=jsonpath={@}{"\\n"}`,
