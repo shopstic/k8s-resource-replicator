@@ -1,6 +1,5 @@
 import {
   Static,
-  Type,
 } from "https://raw.githubusercontent.com/shopstic/typebox/0.10.1/src/typebox.ts";
 import {
   applyReducer,
