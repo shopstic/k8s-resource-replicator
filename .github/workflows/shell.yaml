@@ -61,10 +61,16 @@ jobs:
       - run: chmod +r ~/.docker/config.json
 
       - name: Compile
-        uses: docker://shopstic/k8s-resource-replicator-ci:${{ hashFiles('shell/*') }}
-        with:
-          entrypoint: ./ci.sh
-          args: compile
+        env:
+          IMAGE_NAME: shopstic/k8s-resource-replicator-ci
+          IMAGE_TAG: ${{ hashFiles('shell/*') }}
+        run: |-
+          docker run \
+            --workdir /repo \
+            --rm \
+            -v "${GITHUB_WORKSPACE}:/repo" \
+            "${IMAGE_NAME}:${IMAGE_TAG}"
+            ./ci.sh compile
 
       - name: Buildkit
         env:
