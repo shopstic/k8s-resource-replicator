@@ -10,7 +10,7 @@ defaults:
     shell: bash
 
 jobs:
-  build:
+  build-shell:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,19 +29,62 @@ jobs:
           IMAGE_TAG: ${{ hashFiles('shell/*') }}
         run: |-
           docker run \
-            --workdir /github/workspace \
+            --workdir /repo \
             --rm \
             --security-opt seccomp=unconfined \
             --security-opt apparmor=unconfined \
             -e BUILDKITD_FLAGS=--oci-worker-no-process-sandbox \
              --entrypoint "buildctl-daemonless.sh" \
-             -v "/home/runner/work/k8s-resource-replicator/k8s-resource-replicator":"/github/workspace" \
-             -v "/home/runner/.docker/config.json":"/home/user/.docker/config.json" \
+             -v "${GITHUB_WORKSPACE}:/repo" \
+             -v "${HOME}/.docker/config.json":"/home/user/.docker/config.json" \
              shopstic/buildkit:0.8.2 \
                build \
               --frontend dockerfile.v0 \
-              --local context=/github/workspace/shell \
-              --local dockerfile=/github/workspace/shell \
+              --local context=/repo/shell \
+              --local dockerfile=/repo/shell \
+              --output "type=image,name=${IMAGE_NAME}:${IMAGE_TAG},push=true" \
+              --export-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__" \
+              --import-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__"
+
+  build-app:
+    needs: build-shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - run: chmod +r ~/.docker/config.json
+
+      - name: Compile
+        uses: docker://shopstic/k8s-resource-replicator-ci:${{ hashFiles('shell/*') }}
+        with:
+          entrypoint: ./ci.sh
+          args: compile
+
+      - name: Buildkit
+        env:
+          IMAGE_NAME: shopstic/k8s-resource-replicator
+          IMAGE_TAG: ${{ env.GITHUB_SHA }}
+        run: |-
+          docker run \
+            --workdir /repo \
+            --rm \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
+            -e BUILDKITD_FLAGS=--oci-worker-no-process-sandbox \
+             --entrypoint "buildctl-daemonless.sh" \
+             -v "${GITHUB_WORKSPACE}:/repo" \
+             -v "${HOME}/.docker/config.json":"/home/user/.docker/config.json" \
+             shopstic/buildkit:0.8.2 \
+               build \
+              --frontend dockerfile.v0 \
+              --local context=/repo \
+              --local dockerfile=/repo \
               --output "type=image,name=${IMAGE_NAME}:${IMAGE_TAG},push=true" \
               --export-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__" \
               --import-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__"
