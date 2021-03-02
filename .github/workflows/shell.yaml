@@ -65,12 +65,9 @@ jobs:
           IMAGE_NAME: shopstic/k8s-resource-replicator-ci
           IMAGE_TAG: ${{ hashFiles('shell/*') }}
         run: |-
-          docker run \
-            --workdir /repo \
-            --rm \
-            -v "${GITHUB_WORKSPACE}:/repo" \
-            "${IMAGE_NAME}:${IMAGE_TAG}" \
-            zsh -lc "./ci.sh compile"
+          cat <<EOF | docker run -i --workdir /repo --rm -v "${GITHUB_WORKSPACE}:/repo" "${IMAGE_NAME}:${IMAGE_TAG}" zsh -l
+          ./ci.sh compile
+          EOF
 
       - name: Buildkit
         env:
