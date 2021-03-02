@@ -22,4 +22,4 @@ jobs:
           BUILD_CACHE: /home/runner/.docker/buildkit
         with:
           entrypoint: /bin/sh
-          args: "-c 'buildkitd -version; env; pwd; ls -la'"
+          args: -c "buildkitd --version; env; pwd; ls -la"
