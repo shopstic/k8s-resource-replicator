@@ -23,7 +23,7 @@ jobs:
 
       - run: chmod +r ~/.docker/config.json
 
-      - name: Buildkit
+      - name: Build and push shell Docker image
         env:
           IMAGE_NAME: shopstic/k8s-resource-replicator-ci
           IMAGE_TAG: ${{ hashFiles('shell/*') }}
@@ -66,10 +66,11 @@ jobs:
           IMAGE_TAG: ${{ hashFiles('shell/*') }}
         run: |-
           cat <<EOF | docker run -i --workdir /repo --rm -v "${GITHUB_WORKSPACE}:/repo" "${IMAGE_NAME}:${IMAGE_TAG}" zsh -li
+          ./ci.sh code_quality
           ./ci.sh compile
           EOF
 
-      - name: Buildkit
+      - name: Build and push Docker image
         env:
           IMAGE_NAME: shopstic/k8s-resource-replicator
         run: |-
