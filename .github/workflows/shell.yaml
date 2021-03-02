@@ -16,7 +16,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Buildkit
-        uses: docker://moby/buildkit:master-rootless
         env:
           DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
         run: |-
