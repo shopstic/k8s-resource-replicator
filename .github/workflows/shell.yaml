@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - run: chmod +r ~/.docker/config.json
-      
+
       - name: Buildkit
         env:
           IMAGE_NAME: shopstic/k8s-resource-replicator-ci
@@ -37,7 +37,7 @@ jobs:
              --entrypoint "buildctl-daemonless.sh" \
              -v "/home/runner/work/k8s-resource-replicator/k8s-resource-replicator":"/github/workspace" \
              -v "/home/runner/.docker/config.json":"/home/user/.docker/config.json" \
-             moby/buildkit:master-rootless \
+             shopstic/buildkit:0.8.2 \
                build \
               --frontend dockerfile.v0 \
               --local context=/github/workspace/shell \
