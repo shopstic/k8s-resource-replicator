@@ -72,7 +72,6 @@ jobs:
       - name: Buildkit
         env:
           IMAGE_NAME: shopstic/k8s-resource-replicator
-          IMAGE_TAG: ${{ env.GITHUB_SHA }}
         run: |-
           docker run \
             --workdir /repo \
@@ -88,6 +87,6 @@ jobs:
               --frontend dockerfile.v0 \
               --local context=/repo \
               --local dockerfile=/repo \
-              --output "type=image,name=${IMAGE_NAME}:${IMAGE_TAG},push=true" \
+              --output "type=image,name=${IMAGE_NAME}:${GITHUB_SHA},push=true" \
               --export-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__" \
               --import-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__"
