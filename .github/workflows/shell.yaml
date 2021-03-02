@@ -20,6 +20,7 @@ jobs:
         env:
           DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
           BUILD_CACHE: /home/runner/.docker/buildkit
+          BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
         with:
           entrypoint: buildctl-daemonless.sh
           args: build --frontend dockerfile.v0 --local context=/github/workspace/shell --local dockerfile=/github/workspace/shell
