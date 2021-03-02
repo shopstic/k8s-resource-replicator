@@ -36,7 +36,7 @@ jobs:
              -v "/home/runner/work/k8s-resource-replicator/k8s-resource-replicator":"/github/workspace" \
              -v "/home/runner/.docker/config.json":"/home/user/.docker/config.json" \
              moby/buildkit:master-rootless \
-               buildctl build \
+               build \
               --frontend dockerfile.v0 \
               --local context=/github/workspace/shell \
               --local dockerfile=/github/workspace/shell \
