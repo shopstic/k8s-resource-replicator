@@ -15,9 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - shell: bash
+        env:
+          DOCKER_CONFIG: ${{secrets.DOCKER_CONFIG}}
+        run: |-
+          mkdir ~/.docker
+          echo "$DOCKER_CONFIG" > ~/.docker/config.json'
+
       - name: Buildkit
         env:
-          DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
+          IMAGE_NAME: shopstic/k8s-resource-replicator-ci
+          IMAGE_TAG: ${{ hashFiles('shell/*') }}
         run: |-
           docker run \
             --workdir /github/workspace \
@@ -27,5 +35,12 @@ jobs:
             -e BUILDKITD_FLAGS=--oci-worker-no-process-sandbox \
              --entrypoint "buildctl-daemonless.sh" \
              -v "/home/runner/work/k8s-resource-replicator/k8s-resource-replicator":"/github/workspace" \
+             -v "/home/runner/.docker/config.json":"/home/user/.docker/config.json" \
              moby/buildkit:master-rootless \
-             build --frontend dockerfile.v0 --local context=/github/workspace/shell --local dockerfile=/github/workspace/shell
+               buildctl build \
+              --frontend dockerfile.v0 \
+              --local context=/github/workspace/shell \
+              --local dockerfile=/github/workspace/shell \
+              --output "type=image,name=${IMAGE_NAME}:${IMAGE_TAG},push=true" \
+              --export-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__" \
+              --import-cache "type=registry,ref=${IMAGE_NAME}:__buildcache__"
