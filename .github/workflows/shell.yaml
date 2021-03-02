@@ -70,7 +70,7 @@ jobs:
             --rm \
             -v "${GITHUB_WORKSPACE}:/repo" \
             "${IMAGE_NAME}:${IMAGE_TAG}" \
-            ./ci.sh compile
+            zsh -lc "./ci.sh compile"
 
       - name: Buildkit
         env:
