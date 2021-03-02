@@ -19,8 +19,14 @@ jobs:
         uses: docker://moby/buildkit:master-rootless
         env:
           DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
-          BUILD_CACHE: /home/runner/.docker/buildkit
-          BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
-        with:
-          entrypoint: buildctl-daemonless.sh
-          args: build --frontend dockerfile.v0 --local context=/github/workspace/shell --local dockerfile=/github/workspace/shell
+        run: |-
+          docker run \
+            --workdir /github/workspace \
+            --rm \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
+            -e BUILDKITD_FLAGS=--oci-worker-no-process-sandbox \
+             --entrypoint "buildctl-daemonless.sh" \
+             -v "/home/runner/work/k8s-resource-replicator/k8s-resource-replicator":"/github/workspace" \
+             moby/buildkit:master-rootless \
+             build --frontend dockerfile.v0 --local context=/github/workspace/shell --local dockerfile=/github/workspace/shell
