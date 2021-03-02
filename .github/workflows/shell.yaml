@@ -69,7 +69,7 @@ jobs:
             --workdir /repo \
             --rm \
             -v "${GITHUB_WORKSPACE}:/repo" \
-            "${IMAGE_NAME}:${IMAGE_TAG}"
+            "${IMAGE_NAME}:${IMAGE_TAG}" \
             ./ci.sh compile
 
       - name: Buildkit
