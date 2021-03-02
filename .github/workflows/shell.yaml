@@ -12,14 +12,14 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
-      BUILD_CACHE: /home/runner/.docker/buildkit
     steps:
       - uses: actions/checkout@v2
 
       - name: Buildkit
         uses: docker://moby/buildkit@sha256:c33ef53440a2a7f9c70f7132d39fd16b52e62f003d5eb7af265a65eb99cd3fb5
+        env:
+          DOCKER_IMAGE_HASH: ${{ hashFiles('shell/*') }}
+          BUILD_CACHE: /home/runner/.docker/buildkit
         with:
           entrypoint: /bin/sh
           args: "-c 'buildkitd -version; env; pwd; ls -la'"
