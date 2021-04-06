@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and push shell Docker image
         id: buildkit
-        uses: shopstic/buildkit-action@1.0.4
+        uses: shopstic/buildkit-action@1.0.5
         with:
           context: ${{ github.workspace }}/images/shell
           image: shopstic/k8s-resource-replicator-ci
@@ -67,11 +67,11 @@ jobs:
           if ls "${DENO_DIR}" > /dev/null 2>&1; then
             du -sh "${DENO_DIR}"
           fi
-          
+
           ./cli.sh ci_build_in_shell
 
       - name: Build and push app Docker image
-        uses: shopstic/buildkit-action@1.0.4
+        uses: shopstic/buildkit-action@1.0.5
         if: github.ref == 'refs/heads/main'
         with:
           context: ${{ github.workspace }}/images/app
