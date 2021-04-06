@@ -1,0 +1,69 @@
+name: CI Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-env:
+    name: Build CI environment image
+    runs-on: ubuntu-20.04
+    outputs:
+      image: ${{ steps.buildkit.outputs.image }}:${{ steps.buildkit.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - run: chmod +r ~/.docker/config.json
+
+      - name: Build and push shell Docker image
+        id: buildkit
+        uses: shopstic/buildkit-action@1.0.4
+        with:
+          context: ${{ github.workspace }}/images/shell
+          image: shopstic/k8s-resource-replicator-ci
+          tag: ${{ hashFiles('images/shell/*') }}
+          skipIfExists: true
+
+  build-app:
+    name: Build app image
+    needs: build-app
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - run: chmod +r ~/.docker/config.json
+
+      - name: Compile
+        env:
+          SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
+        run: |-
+          cat <<EOF | docker run -i --workdir /repo --rm -v "${GITHUB_WORKSPACE}:/repo" "${SHELL_IMAGE}" bash -euo pipefail
+          ./ci.sh code_quality
+          ./ci.sh compile
+          EOF
+
+      - name: Build and push app Docker image
+        uses: shopstic/buildkit-action@1.0.4
+        if: github.ref == 'refs/heads/main'
+        with:
+          context: ${{ github.workspace }}/images/app
+          image: shopstic/k8s-resource-replicator
+          tag: ${GITHUB_SHA}
+          skipIfExists: false
