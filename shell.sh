@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Building shell image if needed..."
-(cd ./images/shell && docker build -f ./Dockerfile .)
-IMAGE_ID=$(cd ./images/shell && docker build -qf ./Dockerfile .)
+docker build ./images/shell
+IMAGE_ID=$(docker build -q ./images/shell)
+
 docker run \
   -it --rm \
   --privileged \
