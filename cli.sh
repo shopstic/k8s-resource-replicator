@@ -23,7 +23,6 @@ EOF
 
 }
 
-
 code_quality() {
   echo "Checking formatting..."
   deno fmt --unstable --check
