@@ -25,9 +25,9 @@ EOF
 
 code_quality() {
   echo "Checking formatting..."
-  deno fmt --unstable --check
+  deno fmt --unstable --check ./src
   echo "Linting..."
-  deno lint --unstable
+  deno lint --unstable ./src
   # echo "Runnning tests..."
   # deno test -A
 }
