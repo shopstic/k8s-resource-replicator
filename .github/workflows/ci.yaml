@@ -64,7 +64,10 @@ jobs:
           SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
           DENO_DIR: ${{ github.workspace }}/.cache/deno
         run: |-
-          (du -sh "${DENO_DIR}" || true)
+          if ls "${DENO_DIR}" > /dev/null 2>&1; then
+            du -sh "${DENO_DIR}"
+          fi
+          
           ./cli.sh ci_build_in_shell
 
       - name: Build and push app Docker image
