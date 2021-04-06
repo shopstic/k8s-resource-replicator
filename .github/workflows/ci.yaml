@@ -37,7 +37,7 @@ jobs:
 
   build-app:
     name: Build app image
-    needs: build-app
+    needs: build-env
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
