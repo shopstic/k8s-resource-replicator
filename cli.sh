@@ -3,7 +3,7 @@ set -euo pipefail
 
 ci_build_in_shell() {
   local DENO_DIR=${DENO_DIR:?"DENO_DIR env variable is required"}
-  local SHELL_NAME=${SHELL_NAME:?"SHELL_NAME env variable is required"}
+  local SHELL_IMAGE=${SHELL_IMAGE:?"SHELL_IMAGE env variable is required"}
   local GITHUB_WORKSPACE=${GITHUB_WORKSPACE:?"GITHUB_WORKSPACE env variable is required"}
 
   cat <<EOF | docker run \
@@ -13,7 +13,7 @@ ci_build_in_shell() {
     -v "${GITHUB_WORKSPACE}:/repo" \
     -v "${DENO_DIR}:/root/.cache/deno" \
     -e "DENO_DIR=/root/.cache/deno" \
-    "${SHELL_NAME}" \
+    "${SHELL_IMAGE}" \
     bash -l
 set -euo pipefail
 
