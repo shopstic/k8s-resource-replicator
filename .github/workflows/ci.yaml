@@ -58,7 +58,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-                        
+
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -86,3 +86,24 @@ jobs:
           image: shopstic/k8s-resource-replicator
           tag: ${{ github.sha }}
           skipIfExists: false
+
+      - name: Build and push Helm Chart
+        uses: shopstic/buildkit-action@1.0.5
+        if: github.ref == 'refs/heads/main'
+        env:
+          SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |-
+          cat <<EOF | docker run \
+            --workdir /repo \
+            -i \
+            --rm \
+            -v "${GITHUB_WORKSPACE}:/repo" \
+            -v "${HOME}/.docker/config.json:/root/.docker/config.json" \
+            "${SHELL_IMAGE}" \
+            bash -l
+          set -euo pipefail
+          export HELM_EXPERIMENTAL_OCI=1
+          helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
+          helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
+          EOF
