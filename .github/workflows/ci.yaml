@@ -88,7 +88,6 @@ jobs:
           skipIfExists: false
 
       - name: Build and push Helm Chart
-        uses: shopstic/buildkit-action@1.0.5
         if: github.ref == 'refs/heads/main'
         env:
           SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
