@@ -100,11 +100,11 @@ jobs:
             -i \
             --rm \
             -v "${GITHUB_WORKSPACE}:/repo" \
+            -v "${HOME}/.docker/config.json:/root/.docker/config.json" \
             "${SHELL_IMAGE}" \
             bash -l
           set -euo pipefail
           export HELM_EXPERIMENTAL_OCI=1
-          echo "${GITHUB_TOKEN}" | helm registry login -u "${GITHUB_ACTOR}" --password-stdin ghcr.io
           helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
           helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
           EOF
