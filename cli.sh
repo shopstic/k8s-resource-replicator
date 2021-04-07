@@ -36,4 +36,14 @@ compile() {
   deno compile -A --unstable -o ./images/app/k8s-resource-replicator ./src/app.ts
 }
 
+helm_chart_push() {
+  local GITHUB_ACTOR=${GITHUB_ACTOR:?"GITHUB_ACTOR env variable is required"}
+  local GITHUB_TOKEN=${GITHUB_TOKEN:?"GITHUB_TOKEN env variable is required"}
+  local GITHUB_SHA=${GITHUB_SHA:?"GITHUB_SHA env variable is required"}
+
+  export HELM_EXPERIMENTAL_OCI=1
+  helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
+  helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
+}
+
 "$@"
