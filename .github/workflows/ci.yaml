@@ -111,6 +111,7 @@ jobs:
             --workdir /repo \
             -i \
             --rm \
+            -e GITHUB_SHA \
             -v "${GITHUB_WORKSPACE}:/repo" \
             -v "${HOME}/.docker/config.json:/root/.docker/config.json" \
             "${SHELL_IMAGE}" \
