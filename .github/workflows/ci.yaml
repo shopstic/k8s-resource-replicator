@@ -120,6 +120,7 @@ jobs:
           export HELM_EXPERIMENTAL_OCI=1
           export HELM_REGISTRY_CONFIG=/root/.docker/config.json
 
+          yq e '.appVersion = env(GITHUB_SHA)' -i ./charts/resource-replicator/Chart.yaml 
           helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
           helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
           

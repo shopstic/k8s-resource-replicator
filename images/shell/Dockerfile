@@ -2,6 +2,7 @@ FROM shopstic/bin-dumb-init:1.2.2 as bin-dumb-init
 FROM shopstic/bin-kubectl:1.20.4 as bin-kubectl
 FROM shopstic/bin-deno:1.8.3 as bin-deno
 FROM shopstic/bin-helm:3.5.3 as bin-helm
+FROM shopstic/bin-yq:4.6.3 as bin-yq
 
 
 # kube-ps1 ------------------------------------------------------------------
@@ -25,6 +26,7 @@ COPY --from=bin-dumb-init /usr/bin/dumb-init /usr/bin/dumb-init
 COPY --from=bin-kubectl /usr/bin/kubectl /usr/bin/kubectl
 COPY --from=bin-helm /usr/bin/helm /usr/bin/helm
 COPY --from=bin-deno /usr/bin/deno /usr/bin/deno
+COPY --from=bin-yq /usr/bin/yq /usr/bin/yq
 COPY --from=kube-ps1 /root/kube-ps1.sh /root/kube-ps1.sh
 
 COPY ./.profile /root/.profile
