@@ -1,7 +1,7 @@
 image:
   repository: shopstic/k8s-resource-replicator
-  pullPolicy: Always
-  tag: "latest"
+  pullPolicy: IfNotPresent
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
