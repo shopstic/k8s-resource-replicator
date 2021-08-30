@@ -92,7 +92,7 @@ ${JSON.stringify(result.errors, null, 2)}
 
     if (code !== 0) {
       const stderrPayload = new TextDecoder().decode(
-        await Deno.readAll(watchProcess.stderr!),
+        await readAll(watchProcess.stderr!),
       );
 
       throw new WatchFailure(
