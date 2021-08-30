@@ -10,8 +10,12 @@ code_quality() {
   # deno test -A
 }
 
+update_lock() {
+  deno cache ./src/deps/*.ts  --lock ./lock.json --lock-write
+}
+
 compile() {
-  deno compile -A --unstable -o ./images/app/k8s-resource-replicator ./src/app.ts
+  deno compile --lock=lock.json -A --unstable -o ./images/app/k8s-resource-replicator ./src/app.ts
 }
 
 "$@"

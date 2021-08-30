@@ -1,7 +1,7 @@
 FROM shopstic/bin-dumb-init:1.2.2 as bin-dumb-init
-FROM shopstic/bin-kubectl:1.20.4 as bin-kubectl
+FROM shopstic/bin-kubectl:1.21.4 as bin-kubectl
 
-FROM debian:stable-20210111-slim
+FROM debian:stable-20210816-slim
 
 RUN \
   apt-get update && \

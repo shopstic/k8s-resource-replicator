@@ -1,12 +1,6 @@
-import {
-  Static,
-} from "https://raw.githubusercontent.com/shopstic/typebox/0.10.1/src/typebox.ts";
-import {
-  applyReducer,
-} from "https://cdn.skypack.dev/fast-json-patch@3.0.0-1?dts";
-import {
-  inheritExec,
-} from "https://raw.githubusercontent.com/shopstic/deno-utils/1.0.2/src/exec-utils.ts";
+import { Static } from "./deps/typebox.ts";
+import { applyReducer } from "./deps/fast-json-patch.ts";
+import { inheritExec } from "./deps/exec-utils.ts";
 import {
   WatchCompletedPrematurely,
   WatchFailure,
@@ -18,8 +12,8 @@ import {
   ReplicatedResourceSpecSchema,
 } from "./schemas.ts";
 import { sleep } from "./utils.ts";
-import { Logger } from "https://deno.land/x/optic@1.2.2/logger/logger.ts";
-import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "https://raw.githubusercontent.com/shopstic/k8s-deno-client/1.19.2/models/IoK8sApimachineryPkgApisMetaV1OwnerReference.ts";
+import { Logger } from "./deps/optic.ts";
+import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "./deps/k8s-utils.ts";
 import Template from "./template.ts";
 
 function stripKey(event: unknown, path: string[]) {

@@ -1,8 +1,13 @@
 # Kubernetes Resource Replicator
 
-[![CI](https://github.com/shopstic/k8s-resource-replicator/actions/workflows/ci.yaml/badge.svg)](https://github.com/shopstic/k8s-resource-replicator/actions) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/shopstic/k8s-resource-replicator/blob/main/LICENSE) [![Docker](https://img.shields.io/docker/v/shopstic/k8s-resource-replicator?arch=amd64&color=%23ab47bc&label=Docker%20Image&sort=date)](https://hub.docker.com/repository/docker/shopstic/k8s-resource-replicator/tags?page=1&ordering=last_updated)
+[![CI](https://github.com/shopstic/k8s-resource-replicator/actions/workflows/ci.yaml/badge.svg)](https://github.com/shopstic/k8s-resource-replicator/actions)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/shopstic/k8s-resource-replicator/blob/main/LICENSE)
+[![Docker](https://img.shields.io/docker/v/shopstic/k8s-resource-replicator?arch=amd64&color=%23ab47bc&label=Docker%20Image&sort=date)](https://hub.docker.com/repository/docker/shopstic/k8s-resource-replicator/tags?page=1&ordering=last_updated)
 
-A very lean and fast Kubernetes operator which enables replication of resources (e.g `ConfigMap`, `Secret`, etc.) across namespaces. It also supports [JSON Patch](http://jsonpatch.com/) operations to allow transformation of the payload with ease.
+A very lean and fast Kubernetes operator which enables replication of resources
+(e.g `ConfigMap`, `Secret`, etc.) across namespaces. It also supports
+[JSON Patch](http://jsonpatch.com/) operations to allow transformation of the
+payload with ease.
 
 Example of a CRD instance:
 
@@ -36,4 +41,8 @@ spec:
       replace: false
 ```
 
-Which will replicate a Secret named `some-foo-secret` from namespace `foo` to a Secret named `some-bar-secret` in namespace `bar` (the same namespace where this `ReplicatedResource` instance is created), while performing some transformations as specified as JSON Patch operations. Replication reacts almost instantaneously to any changes by leveraging "watch" capability of Kubernetes APIs.
+Which will replicate a Secret named `some-foo-secret` from namespace `foo` to a
+Secret named `some-bar-secret` in namespace `bar` (the same namespace where this
+`ReplicatedResource` instance is created), while performing some transformations
+as specified as JSON Patch operations. Replication reacts almost instantaneously
+to any changes by leveraging "watch" capability of Kubernetes APIs.

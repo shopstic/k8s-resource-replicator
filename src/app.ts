@@ -2,7 +2,7 @@ import { loggerWithContext } from "./logger.ts";
 import { replicate } from "./replicate.ts";
 import { ReplicatedResourceWatchEventSchema } from "./schemas.ts";
 import { WatchCompletedPrematurely, watchResources } from "./watch.ts";
-import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "https://raw.githubusercontent.com/shopstic/k8s-deno-client/1.19.2/models/IoK8sApimachineryPkgApisMetaV1OwnerReference.ts";
+import { IoK8sApimachineryPkgApisMetaV1OwnerReference } from "./deps/k8s-utils.ts";
 import { sleep } from "./utils.ts";
 
 const logger = loggerWithContext("main");

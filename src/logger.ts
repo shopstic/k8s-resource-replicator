@@ -1,5 +1,4 @@
-import { ConsoleStream, Logger } from "https://deno.land/x/optic@1.2.2/mod.ts";
-import { TokenReplacer } from "https://deno.land/x/optic@1.2.2/formatters/tokenReplacer.ts";
+import { ConsoleStream, Logger, TokenReplacer } from "./deps/optic.ts";
 
 export function loggerWithContext(ctx: string) {
   return new Logger()

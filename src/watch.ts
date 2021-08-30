@@ -1,9 +1,6 @@
-import { readLines } from "https://deno.land/std@0.85.0/io/bufio.ts";
-import { validate } from "https://raw.githubusercontent.com/shopstic/deno-utils/1.0.2/src/validation-utils.ts";
-import {
-  Static,
-  TStatic,
-} from "https://raw.githubusercontent.com/shopstic/typebox/0.10.1/src/typebox.ts";
+import { readAll, readLines } from "./deps/std-io.ts";
+import { validate } from "./deps/validation-utils.ts";
+import { Static, TSchema } from "./deps/typebox.ts";
 
 export class WatchFailure extends Error {
   constructor(public stderr: string, message?: string) {
@@ -19,7 +16,7 @@ export class WatchCompletedPrematurely extends Error {
   }
 }
 
-export async function* watchResources<S extends TStatic>(
+export async function* watchResources<S extends TSchema>(
   { fullName, namespace, schema, cancellation }: {
     schema: S;
     fullName: string;
