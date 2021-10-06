@@ -95,6 +95,8 @@ jobs:
       - name: Github ref name
         id: ref_name
         run: |
+          echo "GITHUB_REF=${GITHUB_REF}"
+
           BRANCH=""
           TAG=""
           if [[ "${GITHUB_REF}" =~ ^refs/heads/.* ]]; then
@@ -107,6 +109,8 @@ jobs:
             TAG=${GITHUB_SHA}
           fi
 
+          echo "BRANCH=${BRANCH}"
+          echo "TAG=${TAG}"
           echo "::set-output name=branch::${BRANCH}"
           echo "::set-output name=tag::${TAG}"
 
