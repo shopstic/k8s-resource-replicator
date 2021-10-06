@@ -29,7 +29,7 @@ jobs:
 
       - name: Build and push shell Docker image
         id: buildkit
-        uses: shopstic/buildkit-action@1.0.5
+        uses: shopstic/buildkit-action@1.0.12
         with:
           context: ${{ github.workspace }}/images/shell
           image: ghcr.io/shopstic/k8s-resource-replicator-ci
@@ -92,20 +92,38 @@ jobs:
           
           EOF
 
+      - name: Github ref name
+        id: ref_name
+        run: |
+          BRANCH=""
+          TAG=""
+          if [[ "${GITHUB_REF}" =~ ^refs/heads/.* ]]; then
+            BRANCH=${GITHUB_REF#refs/heads/}
+          fi
+
+          if [[ "${GITHUB_REF}" =~ ^refs/tags/.* ]]; then
+            TAG=${GITHUB_REF#refs/tags/}
+          elif [[ "${BRANCH}" == "main" ]]; then
+            TAG=${GITHUB_SHA}
+          fi
+
+          echo "::set-output name=branch::${BRANCH}"
+          echo "::set-output name=tag::${TAG}"
+
       - name: Build and push app Docker image
-        uses: shopstic/buildkit-action@1.0.5
-        if: github.ref == 'refs/heads/main'
+        uses: shopstic/buildkit-action@1.0.12
+        if: steps.ref_name.outputs.tag != ''
         with:
           context: ${{ github.workspace }}/images/app
           image: shopstic/k8s-resource-replicator
-          tag: ${{ github.sha }}
+          tag: ${{ steps.ref_name.outputs.tag }}
           skipIfExists: false
 
       - name: Build and push Helm Chart
-        if: github.ref == 'refs/heads/main'
+        if: steps.ref_name.outputs.tag != ''
         env:
           SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
-          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_TAG: ${{ steps.ref_name.outputs.tag }}
         run: |-
           cat <<EOF | docker run \
             --workdir /repo \
