@@ -130,7 +130,7 @@ jobs:
             --workdir /repo \
             -i \
             --rm \
-            -e GITHUB_SHA \
+            -e GITHUB_TAG \
             -v "${GITHUB_WORKSPACE}:/repo" \
             -v "${HOME}/.docker/config.json:/root/.docker/config.json" \
             "${SHELL_IMAGE}" \
@@ -140,8 +140,8 @@ jobs:
           export HELM_EXPERIMENTAL_OCI=1
           export HELM_REGISTRY_CONFIG=/root/.docker/config.json
 
-          yq e '.appVersion = env(GITHUB_SHA)' -i ./charts/resource-replicator/Chart.yaml 
-          helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
-          helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_SHA}"
+          yq e '.appVersion = env(GITHUB_TAG)' -i ./charts/resource-replicator/Chart.yaml 
+          helm chart save ./charts/resource-replicator "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_TAG}"
+          helm chart push "ghcr.io/shopstic/chart-resource-replicator:${GITHUB_TAG}"
           
           EOF
