@@ -56,7 +56,7 @@ function patch(
     object.stringData = Object.fromEntries(
       Object
         .entries(object.data as Record<string, string>)
-        .map(([k, v]) => ([k, atob(v)])),
+        .map(([k, v]) => [k, atob(v)]),
     );
     delete object.data;
   }

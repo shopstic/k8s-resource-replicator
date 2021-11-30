@@ -1,0 +1,53 @@
+name: Build
+description: Build
+inputs:
+  tailscaleAuthKey:
+    description: "Tailscale auth key"
+    required: true
+  nixBuildSshKey:
+    description: "Nix build SSH key"
+    required: true
+  dockerHubUsername:
+    description: ""
+    required: true
+  dockerHubToken:
+    description: ""
+    required: true
+  arch:
+    description: "Architecture"
+    required: true
+outputs:
+  digest:
+    description: Digest
+    value: ${{ steps.push.outputs.digest }}
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: shopstic/tailscale-nix-builder/setup@9f19de9453fa4aee80e1ad404fb45af87ecbbd15
+      with:
+        tailscaleAuthKey: ${{ inputs.tailscaleAuthKey }}
+        nixBuildSshKey: ${{ inputs.nixBuildSshKey }}
+
+    - name: Build
+      shell: bash
+      run: |-
+        nix build -L -v '.#packages.${{ inputs.arch }}-linux.image'
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ inputs.dockerHubUsername }}
+        password: ${{ inputs.dockerHubToken }}
+
+    - shell: bash
+      run: chmod +r ~/.docker/config.json
+
+    - name: Push
+      shell: nix develop -v -c bash {0}
+      id: push
+      env:
+        IMAGE_TAG: dev-${{ inputs.arch }}-${{ github.sha }}
+      run: |-
+        DIGEST=$(./release.sh push_image "${IMAGE_TAG}") || exit $?
+        echo ::set-output name=digest::"${DIGEST}"

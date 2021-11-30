@@ -1,4 +1,4 @@
-import { readAll, readLines } from "./deps/std-io.ts";
+import { readAll, readLines } from "./deps/std.ts";
 import { validate } from "./deps/validation-utils.ts";
 import { Static, TSchema } from "./deps/typebox.ts";
 
@@ -41,14 +41,19 @@ export async function* watchResources<S extends TSchema>(
   });
 
   let isCancelled = false;
+  let cancellationError: Error | null = null;
 
   try {
     let lastPayload = null;
 
-    cancellation.finally(() => {
-      isCancelled = true;
-      watchProcess.close();
-    });
+    cancellation
+      .catch((e) => {
+        cancellationError = e;
+      })
+      .finally(() => {
+        isCancelled = true;
+        watchProcess.close();
+      });
 
     for await (const payload of readLines(watchProcess.stdout!)) {
       if (payload.length === 0 || payload === lastPayload) {
@@ -85,6 +90,9 @@ ${JSON.stringify(result.errors, null, 2)}
     }
 
     if (isCancelled) {
+      if (cancellationError) {
+        throw cancellationError;
+      }
       return;
     }
 

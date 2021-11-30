@@ -14,6 +14,10 @@ update_lock() {
   deno cache ./src/deps/*.ts  --lock ./lock.json --lock-write
 }
 
+bundle() {
+  deno bundle --lock=lock.json ./src/app.ts > ./app.js
+}
+
 compile() {
   deno compile --lock=lock.json -A --unstable -o ./images/app/k8s-resource-replicator ./src/app.ts
 }

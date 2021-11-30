@@ -1,0 +1,69 @@
+{
+  "nodes": {
+    "flakeUtils": {
+      "locked": {
+        "lastModified": 1637014545,
+        "narHash": "sha256-26IZAc5yzlD9FlDT54io1oqG/bBoyka+FJk5guaX4x4=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "bba5dcc8e0b20ab664967ad83d24d64cb64ec4f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "hotPot": {
+      "inputs": {
+        "flakeUtils": "flakeUtils",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1638264157,
+        "narHash": "sha256-nFa7TzSQyRtD3/+g3+2XvkUucCFE/yg9z60ltfK8iLs=",
+        "owner": "shopstic",
+        "repo": "nix-hot-pot",
+        "rev": "86e04efbed49d837ddd9e1496b83e97c6fe39473",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shopstic",
+        "repo": "nix-hot-pot",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1636637818,
+        "narHash": "sha256-hC117rP0yLZIMHlrLsgoM9yUBXX/pIPITAfmesuk3sM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "29830319abf5a925921885974faae5509312b940",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "29830319abf5a925921885974faae5509312b940",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flakeUtils": [
+          "hotPot",
+          "flakeUtils"
+        ],
+        "hotPot": "hotPot",
+        "nixpkgs": [
+          "hotPot",
+          "nixpkgs"
+        ]
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

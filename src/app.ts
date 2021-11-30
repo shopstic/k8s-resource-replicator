@@ -7,17 +7,35 @@ import { sleep } from "./utils.ts";
 
 const logger = loggerWithContext("main");
 
+class ProcessInterruptedError extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, ProcessInterruptedError.prototype);
+  }
+}
+
+function waitForSignal(signal: "SIGINT" | "SIGTERM"): Promise<string> {
+  return new Promise((resolve) => {
+    function listener() {
+      // deno-lint-ignore ban-ts-comment
+      // @ts-ignore
+      Deno.removeSignalListener(signal, listener);
+      resolve(signal);
+    }
+
+    // deno-lint-ignore ban-ts-comment
+    // @ts-ignore
+    Deno.addSignalListener(signal, listener);
+  });
+}
+
 async function waitForExitSignal(): Promise<void> {
-  await Promise.race([
-    // deno-lint-ignore ban-ts-comment
-    // @ts-ignore
-    Deno.signal(Deno.Signal.SIGINT),
-    // deno-lint-ignore ban-ts-comment
-    // @ts-ignore
-    Deno.signal(Deno.Signal.SIGTERM),
+  const signal = await Promise.race([
+    waitForSignal("SIGINT"),
+    waitForSignal("SIGTERM"),
   ]);
 
-  return;
+  throw new ProcessInterruptedError(`Process interrupted with ${signal}`);
 }
 
 function createCancellation(): [Promise<void>, () => void] {
@@ -93,6 +111,7 @@ async function watchAndReconcile() {
     }
   }
 }
+
 async function main() {
   while (true) {
     try {
@@ -103,6 +122,9 @@ async function main() {
           `Watch for replicated resources completed prematurely, going to retry in 1s`,
         );
         await sleep(1000);
+      } else if (e instanceof ProcessInterruptedError) {
+        logger.warn(e.message);
+        return;
       } else {
         throw e;
       }
