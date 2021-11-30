@@ -65,4 +65,4 @@ jobs:
           ARM64_DIGEST: ${{ needs.build-aarch64.outputs.digest }}
           IMAGE_TAG: dev-${{ github.sha }}
         run: |-
-          ./release.sh push_multi_arch_manifest "${IMAGE_TAG}" "${AMD64_DIGEST}" "${ARM64_DIGEST}"
+          ./release.sh push_multi_arch_manifest "${IMAGE_TAG}" "${AMD64_DIGEST:?"Missing AMD64_DIGEST"}" "${ARM64_DIGEST:?"Missing ARM64_DIGEST"}"
