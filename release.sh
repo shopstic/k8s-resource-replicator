@@ -5,13 +5,15 @@ DOCKER_IMAGE="docker.io/shopstic/k8s-resource-replicator"
 
 push_image() {
   local TAG=${1:?"Tag is required"}
-  local DIGEST_FILE=${2:?"Digest file is required"}
+  local DIGEST_FILE=$(mktemp)
 
   skopeo copy \
     --insecure-policy \
     --digestfile="${DIGEST_FILE}" \
     docker-archive:./result \
-    docker://"${DOCKER_IMAGE}":"${TAG}"
+    docker://"${DOCKER_IMAGE}":"${TAG}" 1>&2
+
+  cat "${DIGEST_FILE}"
 }
 
 push_multi_arch_manifest() {
@@ -39,3 +41,5 @@ release() {
 
   # gh release create "${RELEASE_VERSION}" --title "Release ${RELEASE_VERSION}" --notes "" --target "${RELEASE_VERSION}"
 }
+
+"$@"

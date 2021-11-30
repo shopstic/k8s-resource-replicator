@@ -49,11 +49,6 @@ runs:
       env:
         IMAGE_TAG: dev-${{ inputs.arch }}-${{ github.sha }}
       run: |-
-        DIGEST_FILE=$(mktemp)
-        
-        ./release.sh push_image "${IMAGE_TAG}" "${DIGEST_FILE}"
-
-        DIGEST=$(cat "${DIGEST_FILE}")
-
+        DIGEST=$(./release.sh push_image "${IMAGE_TAG}") || exit $?
         echo "Produced image digest: ${DIGEST}"
         echo ::set-output name=digest::"${DIGEST}"
