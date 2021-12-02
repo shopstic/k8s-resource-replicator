@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   test:
-    name: Build x86_64
+    name: Test
     runs-on: [self-hosted, nix]
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
