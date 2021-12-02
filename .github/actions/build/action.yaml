@@ -1,12 +1,6 @@
 name: Build
 description: Build
 inputs:
-  tailscaleAuthKey:
-    description: "Tailscale auth key"
-    required: true
-  nixBuildSshKey:
-    description: "Nix build SSH key"
-    required: true
   dockerHubUsername:
     description: ""
     required: true
@@ -23,12 +17,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Setup
-      uses: shopstic/tailscale-nix-builder/setup@9f19de9453fa4aee80e1ad404fb45af87ecbbd15
-      with:
-        tailscaleAuthKey: ${{ inputs.tailscaleAuthKey }}
-        nixBuildSshKey: ${{ inputs.nixBuildSshKey }}
-
     - name: Build
       shell: bash
       run: |-
