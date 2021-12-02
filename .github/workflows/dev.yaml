@@ -62,7 +62,7 @@ jobs:
       - run: chmod +r ~/.docker/config.json
 
       - name: Push multi-arch manifests
-        shell: nix develop -v -c bash {0}
+        shell: nix develop -vv -c bash {0}
         env:
           AMD64_DIGEST: ${{ needs.build-x86_64.outputs.digest }}
           ARM64_DIGEST: ${{ needs.build-aarch64.outputs.digest }}
@@ -71,7 +71,7 @@ jobs:
           ./release.sh push_multi_arch_manifest "${IMAGE_TAG}" "${AMD64_DIGEST:?"Missing AMD64_DIGEST"}" "${ARM64_DIGEST:?"Missing ARM64_DIGEST"}"
 
       - name: Push Helm chart
-        shell: nix develop -v -c bash {0}
+        shell: nix develop -vv -c bash {0}
         env:
           HELM_CHART_VERSION: 1.0.0-${{ github.sha }}
           HELM_APP_VERSION: dev-${{ github.sha }}
