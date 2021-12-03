@@ -65,8 +65,8 @@ jobs:
         run: |-
           manifest-tool push from-args \
             --platforms linux/amd64,linux/arm64 \
-            --template "${IMAGE_REPOSITORY}"/toothpick-server:dev-ARCH-"${GITHUB_SHA}" \
-            --target "${IMAGE_REPOSITORY}"/toothpick-server:dev-"${GITHUB_SHA}"
+            --template "${IMAGE_REPOSITORY}"/k8s-resource-replicator:dev-ARCH-"${GITHUB_SHA}" \
+            --target "${IMAGE_REPOSITORY}"/k8s-resource-replicator:dev-"${GITHUB_SHA}"
 
       - name: Push Helm chart
         shell: nix develop -v -c bash {0}
