@@ -42,6 +42,9 @@
           devShell = pkgs.mkShellNoCC {
             buildInputs = builtins.attrValues {
               inherit deno kubectl;
+              inherit (hotPotPkgs)
+                manifest-tool
+                ;
               inherit (pkgs)
                 skopeo
                 yq-go 

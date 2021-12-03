@@ -1,64 +1,72 @@
 name: Dev
 
-on:
-  push:
-    branches-ignore:
-      - "releases/*"
-  pull_request:
+on: [push]
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  build-x86_64:
-    name: Build x86_64
+  build:
+    name: Build images
     runs-on: [self-hosted, nix]
-    outputs:
-      digest: ${{ steps.build.outputs.digest }}
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
-      - uses: ./.github/actions/build
-        id: build
-        with:
-          imageRepo: public.ecr.aws/g1b1f7a7/k8s-resource-replicator
-          arch: x86_64
-
-  build-aarch64:
-    name: Build aarch64
-    runs-on: [self-hosted, nix]
-    outputs:
-      digest: ${{ steps.build.outputs.digest }}
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
-      - uses: ./.github/actions/build
-        id: build
-        with:
-          imageRepo: public.ecr.aws/g1b1f7a7/k8s-resource-replicator
-          arch: aarch64
-
-  push:
-    name: Push
-    runs-on: [self-hosted, nix]
-    needs: [build-x86_64, build-aarch64]
+    env:
+      IMAGE_REPOSITORY: public.ecr.aws/g1b1f7a7
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: ./.github/actions/login-to-public-ecr
+        with:
+          imageRepo: ${{ env.IMAGE_REPOSITORY }}
 
-      - name: Push multi-arch manifests
+      - name: Build container images
+        run: |-
+          nix build -L -v '.#packages.${{ inputs.arch }}-linux.image' 
+
+      - name: Push
+        env:
+          GITHUB_SHA: ${{ github.sha }}  
+          NIX_ARCH: ${{ matrix.arch }}
+        shell: nix develop -v -c bash {0}
+        run: |-
+          IMAGE_ARCH="amd64"
+          if [[ "${NIX_ARCH}" == "aarch64" ]]; then
+            IMAGE_ARCH="arm64"
+          fi
+
+          IMAGE_TAG="dev-${IMAGE_ARCH}-${GITHUB_SHA}"
+        
+          skopeo --insecure-policy copy \
+            docker-archive:./result \
+            docker://"${IMAGE_REPOSITORY}"/k8s-resource-replicator:"${IMAGE_TAG}"
+
+  push:
+    name: Push
+    runs-on: [self-hosted, nix]
+    needs: [build]
+    env:
+      IMAGE_REPOSITORY: public.ecr.aws/g1b1f7a7    
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+
+      - name: Login to Amazon ECR
+        uses: ./.github/actions/login-to-public-ecr
+        with:
+          imageRepo: ${{ env.IMAGE_REPOSITORY }}
+
+      - name: Push multi-arch manifest
         shell: nix develop -v -c bash {0}
         env:
-          AMD64_DIGEST: ${{ needs.build-x86_64.outputs.digest }}
-          ARM64_DIGEST: ${{ needs.build-aarch64.outputs.digest }}
-          IMAGE_TAG: dev-${{ github.sha }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |-
-          ./release.sh push_multi_arch_manifest \
-            public.ecr.aws/g1b1f7a7/k8s-resource-replicator \
-            "${IMAGE_TAG}" \
-            "${AMD64_DIGEST:?"Missing AMD64_DIGEST"}" \
-            "${ARM64_DIGEST:?"Missing ARM64_DIGEST"}"
+          manifest-tool push from-args \
+            --platforms linux/amd64,linux/arm64 \
+            --template "${IMAGE_REPOSITORY}"/toothpick-server:dev-ARCH-"${GITHUB_SHA}" \
+            --target "${IMAGE_REPOSITORY}"/toothpick-server:dev-"${GITHUB_SHA}"
 
       - name: Push Helm chart
         shell: nix develop -v -c bash {0}
@@ -69,4 +77,4 @@ jobs:
           ./release.sh push_helm_chart \
             "${HELM_CHART_VERSION}" \
             "${HELM_APP_VERSION}" \
-            oci://public.ecr.aws/g1b1f7a7/k8s-resource-replicator-chart
+            "oci://${IMAGE_REPOSITORY}/charts"
