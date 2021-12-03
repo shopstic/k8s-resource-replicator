@@ -1,34 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOCKER_IMAGE="docker.io/shopstic/k8s-resource-replicator"
-
 push_image() {
-  local TAG=${1:?"Tag is required"}
+  local IMAGE_REF=${1:?"Image reference is required"}
   local DIGEST_FILE=$(mktemp)
 
   skopeo copy \
     --insecure-policy \
     --digestfile="${DIGEST_FILE}" \
     docker-archive:./result \
-    docker://"${DOCKER_IMAGE}":"${TAG}" 1>&2
+    docker://"${IMAGE_REF}" 1>&2
 
   cat "${DIGEST_FILE}"
 }
 
 push_multi_arch_manifest() {
-  local TAG=${1:?"Tag is required"}
+  local IMAGE_REPOSITORY=${1:?"Image repository is required"}
+  local TAG=${2:?"Tag is required"}
+  shift
   shift
 
   local FLAGS=()
 
   for DIGEST in "$@"
   do
-    FLAGS+=("--amend" "${DOCKER_IMAGE}@${DIGEST}")
+    FLAGS+=("--amend" "${IMAGE_REPOSITORY}@${DIGEST}")
   done
 
-  docker manifest create "${DOCKER_IMAGE}:${TAG}" "${FLAGS[@]}" 1>&2
-  docker manifest push "${DOCKER_IMAGE}:${TAG}"
+  docker manifest create "${IMAGE_REPOSITORY}:${TAG}" "${FLAGS[@]}" 1>&2
+  docker manifest push "${IMAGE_REPOSITORY}:${TAG}"
 }
 
 push_helm_chart() {

@@ -42,7 +42,12 @@
           devShell = pkgs.mkShellNoCC {
             buildInputs = builtins.attrValues {
               inherit deno kubectl;
-              inherit (pkgs) skopeo yq-go kubernetes-helm;
+              inherit (pkgs)
+                skopeo
+                yq-go 
+                kubernetes-helm
+                awscli2
+                ;
             };
           };
         }
