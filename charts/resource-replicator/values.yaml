@@ -1,5 +1,5 @@
 image:
-  repository: public.ecr.aws/g1b1f7a7/k8s-resource-replicator
+  repository: public.ecr.aws/shopstic/k8s-resource-replicator
   pullPolicy: IfNotPresent
   tag: ""
 
