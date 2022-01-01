@@ -21,11 +21,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1640949334,
-        "narHash": "sha256-bx8ENBxlp4SnnpS12xrlDzEMBEHtEfjJe2I+7iSllJI=",
+        "lastModified": 1641025678,
+        "narHash": "sha256-wzUd8/KQY+St2u6TWlqUX3ie0v2rdvklEKPHFQb3R+0=",
         "owner": "shopstic",
         "repo": "nix-hot-pot",
-        "rev": "b3843ca57039b782f6f811ca3fd469f84d5cbae8",
+        "rev": "d0caed15f18aec8c2a3396f08ff775d766fe29ca",
         "type": "github"
       },
       "original": {
