@@ -68,9 +68,9 @@ export const GenericResourceWatchEventSchema = createWatchEventSchema(
     metadata: Type.PartialObject({
       name: Type.String(),
       namespace: Type.Optional(Type.String()),
-      labels: Type.Optional(Type.Dict(Type.String())),
+      labels: Type.Optional(Type.Record(Type.String(), Type.String())),
       annotations: Type.Optional(Type.Union(
-        [Type.Dict(Type.String()), Type.Null()],
+        [Type.Record(Type.String(), Type.String()), Type.Null()],
       )),
     }),
   }),
@@ -82,9 +82,9 @@ export const ReplicatedResourceSchema = Type.Object({
   metadata: Type.PartialObject({
     name: Type.String(),
     namespace: Type.String(),
-    labels: Type.Optional(Type.Dict(Type.String())),
+    labels: Type.Optional(Type.Record(Type.String(), Type.String())),
     annotations: Type.Optional(Type.Union(
-      [Type.Dict(Type.String()), Type.Null()],
+      [Type.Record(Type.String(), Type.String()), Type.Null()],
     )),
     uid: Type.String(),
   }),
